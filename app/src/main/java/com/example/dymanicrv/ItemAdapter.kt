@@ -7,44 +7,52 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dymanicrv.databinding.RvItemBinding
-import java.text.FieldPosition
 
-class ItemAdapter(private val data: MutableList<Item>) :
-    RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
+class ItemAdapter(private val listener: Listener) :
+    ListAdapter<Item, ItemAdapter.ViewHolder>(ItemCallback), View.OnClickListener {
 
-    private val dataList = data
-
-    inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
-        private val binding = RvItemBinding.bind(view)
-        fun bind(item: Item, position: Int) {
-            binding.textNumber.text = item.value.toString()
-            binding.btnDelete.setOnClickListener {
-                deleteItem(position)
-            }
-        }
-    }
-
-    private fun deleteItem(position: Int) {
-        dataList.removeAt(position)
-        notifyDataSetChanged()
-    }
+    class ViewHolder(val binding: RvItemBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            LayoutInflater.from(parent.context).inflate(
-                R.layout.rv_item,
-                parent,
-                false
-            )
-        )
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = RvItemBinding.inflate(inflater, parent, false)
+
+        binding.btnDelete.setOnClickListener(this)
+        binding.root.setOnClickListener(this)
+
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = dataList[position]
-        holder.bind(item, position)
+        val item = getItem(position)
+        holder.binding.textNumber.text = item.value.toString()
+        with(holder.binding) {
+            root.tag = item
+            btnDelete.tag = item
+        }
     }
 
-    override fun getItemCount(): Int {
-        return dataList.size
+    object ItemCallback: DiffUtil.ItemCallback<Item>() {
+        override fun areItemsTheSame(oldItem: Item, newItem: Item): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areContentsTheSame(oldItem: Item, newItem: Item): Boolean {
+            return oldItem.value == newItem.value
+        }
+
+    }
+    interface Listener {
+        fun deleteItem(item: Item)
+        fun clickItem(item: Item)
+    }
+
+    override fun onClick(v: View) {
+        val item = v.tag as Item
+        when (v.id) {
+            R.id.btn_delete -> listener.deleteItem(item)
+            else -> listener.clickItem(item)
+        }
     }
 }
