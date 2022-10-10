@@ -26,7 +26,7 @@ class ItemAdapter(private val listener: Listener) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.binding.textNumber.text = item.value.toString()
+        holder.binding.textNumber.text = item.number.toString()
         with(holder.binding) {
             root.tag = item
             btnDelete.tag = item
@@ -39,7 +39,7 @@ class ItemAdapter(private val listener: Listener) :
         }
 
         override fun areContentsTheSame(oldItem: Item, newItem: Item): Boolean {
-            return oldItem.value == newItem.value
+            return oldItem.number == newItem.number
         }
 
     }
