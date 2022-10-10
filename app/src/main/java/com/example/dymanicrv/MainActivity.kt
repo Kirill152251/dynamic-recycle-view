@@ -3,8 +3,13 @@ package com.example.dymanicrv
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dymanicrv.databinding.ActivityMainBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         override fun clickItem(item: Item) {
             Toast.makeText(
                 this@MainActivity,
-                "You click ${item.value} item",
+                "You click ${item.number} item",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -32,11 +37,17 @@ class MainActivity : AppCompatActivity() {
         binding.recycleView.layoutManager = GridLayoutManager(this, 2)
         binding.recycleView.adapter = adapter
         itemService.addListener(itemListener)
+        lifecycleScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                delay(5000)
+                itemService.addItem()
+            }
+        }
     }
     private val itemListener: ItemListener = {
         adapter.submitList(it)
     }
-    
+
     override fun onDestroy() {
         super.onDestroy()
         itemService.removeListener(itemListener)
