@@ -1,5 +1,6 @@
 package com.example.dymanicrv
 
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -21,6 +22,7 @@ class MainActivity : AppCompatActivity() {
         override fun deleteItem(item: Item) {
             itemService.deleteItem(item)
         }
+
         override fun clickItem(item: Item) {
             Toast.makeText(
                 this@MainActivity,
@@ -34,7 +36,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.recycleView.layoutManager = GridLayoutManager(this, 2)
+        val orientation = resources.configuration.orientation
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            binding.recycleView.layoutManager = GridLayoutManager(this, 2)
+        } else {
+            binding.recycleView.layoutManager = GridLayoutManager(this, 4)
+        }
         binding.recycleView.adapter = adapter
         itemService.addListener(itemListener)
         lifecycleScope.launch(Dispatchers.IO) {
@@ -44,6 +51,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private val itemListener: ItemListener = {
         adapter.submitList(it)
     }
