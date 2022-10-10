@@ -6,5 +6,8 @@ DYNAMIC RECYCLER
 adding new items(if this pull is not empty).
 5. All this system support orientation changes.
 6. There are 2 columns in portrait orientation and 4 in landscape orientation.
+
+
 ![](forReadme/screen1.png)
+
 ![](forReadme/screen2.png)
