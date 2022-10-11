@@ -4,7 +4,9 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dymanicrv.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
@@ -45,9 +47,11 @@ class MainActivity : AppCompatActivity() {
         binding.recycleView.adapter = adapter
         itemService.addListener(itemListener)
         lifecycleScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                delay(5000)
-                itemService.addItem()
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (isActive) {
+                    delay(5000)
+                    itemService.addItem()
+                }
             }
         }
     }
